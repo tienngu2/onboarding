@@ -1,0 +1,50 @@
+# This Conjur policy demonstrates how to define 2 layers, 2 hosts, 2 grants, 2 policies, and a permit within a Conjur policy file. 
+# policy.yml
+- !policy
+  id: tienngu2
+  body:
+    # First layer
+    - !layer
+      id: web_layer
+
+    # Second layer
+    - !layer
+      id: db_layer
+
+    # First host
+    - !host
+      id: web01
+
+    # Second host
+    - !host
+      id: db01
+
+    # First grant
+    - !grant
+      role: !layer web_layer
+      member: !host web01
+
+    # Second grant
+    - !grant
+      role: !layer db_layer
+      member: !host db01
+
+    # Child policy 1
+    - !policy
+      id: web_policy
+      body:
+        - !variable
+          id: web_api_key
+
+    # Child policy 2
+    - !policy
+      id: db_policy
+      body:
+        - !variable
+          id: db_connection_string
+
+    # Permit
+    - !permit
+      role: !layer web_layer
+      privilege: [read, execute]
+      resource: !variable web_api_key
