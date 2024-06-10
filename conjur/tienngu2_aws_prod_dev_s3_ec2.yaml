@@ -1,0 +1,64 @@
+# This policy is designed to manage access to AWS resources using Conjur.
+# It includes two layers for access control, two hosts that represent entities (such as services or machines),
+# grants to associate hosts with layers, and individual permits to grant specific privileges to the layers for each variable.
+#
+# Root policy document
+- !policy
+  id: tienngu2_aws-s3-ec2
+  body:
+    # Define two layers for grouping access control
+    - !layer
+      id: aws_prod_access
+    - !layer
+      id: aws_dev_access
+
+    # Define two hosts that represent different entities (e.g., services or machines)
+    - !host
+      id: prod_host
+    - !host
+      id: dev_host
+
+    # Grant each host to the corresponding layer
+    - !grant
+      role: !layer aws_prod_access
+      member: !host prod_host
+    - !grant
+      role: !layer aws_dev_access
+      member: !host dev_host
+
+    # Define sub-policies for managing AWS resources
+    # The number of policies can range from 2 to 10 as per your requirements
+    - !policy
+      id: s3_buckets
+      body:
+        - !variable
+          id: bucket_access_key
+        - !variable
+          id: bucket_secret_key
+    - !policy
+      id: ec2_instances
+      body:
+        - !variable
+          id: instance_access_key
+        - !variable
+          id: instance_secret_key
+    # Additional policies can be added here...
+
+    # Define individual permits that grant specified privileges to the layers
+    # for each variable
+    - !permit
+      role: !layer aws_prod_access
+      privilege: [read, update, execute]
+      resource: !variable s3_buckets/bucket_access_key
+    - !permit
+      role: !layer aws_prod_access
+      privilege: [read, update, execute]
+      resource: !variable s3_buckets/bucket_secret_key
+    - !permit
+      role: !layer aws_dev_access
+      privilege: [read, update, execute]
+      resource: !variable ec2_instances/instance_access_key
+    - !permit
+      role: !layer aws_dev_access
+      privilege: [read, update, execute]
+      resource: !variable ec2_instances/instance_secret_key

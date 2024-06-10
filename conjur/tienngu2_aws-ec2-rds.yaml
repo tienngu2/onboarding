@@ -1,0 +1,85 @@
+# This policy is designed to manage access to secrets related to AWS EC2 and RDS instances within Conjur, a security service that manages secrets and other sensitive data. 
+# The policy is structured to define roles, permissions, and secrets for EC2 and RDS resources.
+#
+# Breakdown of the policy:
+# !policy: This is the root policy with the ID tienngu2_aws-ec2-rds. It serves as a container for all the resources and permissions related to AWS EC2 and RDS integration.
+# !layer: Two layers are defined to group access control for different types of hosts. The ec2-instances layer is for grouping EC2 instance hosts, and the rds-instances layer is for grouping RDS instance hosts.
+# !host: Two hosts are defined, ec2-instance-01 and rds-instance-01, representing an EC2 instance and an RDS instance, respectively.
+# !user: A user named tienngu2 is created, who will have permissions to manage EC2 and RDS secrets.
+# !grant: The ec2-instances layer is granted access to the ec2-instance-01 host, and the rds-instances layer is granted access to the rds-instance-01 host. This means that the hosts inherit the permissions assigned to their respective layers.
+# !policy: Two nested policies, ec2 and rds, are defined for managing secrets related to EC2 and RDS instances. Each nested policy contains variables for storing sensitive information.
+# !variable: Variables are defined within the nested policies to securely store secrets. For EC2, access_key_id and secret_access_key are stored. For RDS, db_username and db_password are stored.
+# !permit: Permissions are set up to control who can access these secrets. The ec2-instances layer is given read and execute privileges on the EC2 secret_access_key, and the rds-instances layer is given the same privileges on the RDS db_password. 
+#    Additionally, the user tienngu2 is granted read, update, and execute privileges on all EC2 and RDS variables.
+#
+- !policy
+  id: tienngu2_aws-ec2-rds
+  body:
+    # Layer for grouping EC2 instance hosts
+    - !layer ec2-instances
+
+    # Layer for grouping RDS instance hosts
+    - !layer rds-instances
+
+    # Host representing an EC2 instance
+    - !host ec2-instance-01
+
+    # Host representing an RDS instance
+    - !host rds-instance-01
+
+    # User with permissions to manage EC2 and RDS secrets
+    - !user tienngu2
+
+    # Grant 'ec2-instances' layer access to 'ec2-instance-01' host
+    - !grant
+      role: !layer ec2-instances
+      members:
+        - !host ec2-instance-01
+
+    # Grant 'rds-instances' layer access to 'rds-instance-01' host
+    - !grant
+      role: !layer rds-instances
+      members:
+        - !host rds-instance-01
+
+    # Nested policy for EC2 secrets
+    - !policy
+      id: ec2
+      body:
+        # Variable for storing EC2 access key ID
+        - !variable access_key_id
+
+        # Variable for storing EC2 secret access key
+        - !variable secret_access_key
+
+    # Nested policy for RDS secrets
+    - !policy
+      id: rds
+      body:
+        # Variable for storing RDS database username
+        - !variable db_username
+
+        # Variable for storing RDS database password
+        - !variable db_password
+
+    # Permissions for 'ec2-instances' layer to fetch (read) the EC2 secret_access_key
+    - !permit
+      role: !layer ec2-instances
+      privilege: [read, execute]
+      resource: !variable ec2/secret_access_key
+
+    # Permissions for 'rds-instances' layer to fetch (read) the RDS db_password
+    - !permit
+      role: !layer rds-instances
+      privilege: [read, execute]
+      resource: !variable rds/db_password
+
+    # Permissions for 'tienngu2' user to read, update, and execute on EC2 and RDS secrets
+    - !permit
+      role: !user tienngu2
+      privilege: [read, update, execute]
+      resources:
+        - !variable ec2/access_key_id
+        - !variable ec2/secret_access_key
+        - !variable rds/db_username
+        - !variable rds/db_password
