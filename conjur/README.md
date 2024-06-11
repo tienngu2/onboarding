@@ -78,7 +78,7 @@ member: !host myapp01: This adds the myapp01 host as a member of the myapp layer
 By granting membership, the myapp01 host inherits the permissions assigned to the myapp layer, which means it can read and execute (or fetch) the database/username and database/password variables.
 
 
-## Policy Samples
+## Policy Sample
 
 This Conjur policy [tienngu2_aws_prod_dev_s3_ec2](tienngu2_aws_prod_dev_s3_ec2.md) demonstrates how to define 2 layers, 2 hosts, 2 grants, 2 policies, and a permit within a Conjur policy file. Each component is explained with a reference to the official CyberArk Conjur Secrets Manager Enterprise documentation.
 
