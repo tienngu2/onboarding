@@ -24,7 +24,7 @@ A typical Conjur policy includes:
 
 ### Writing a Policy
 
-To write a Conjur policy, create a YAML file with the necessary definitions. Here's an example of a simple policy:
+To write a Conjur policy, create a YAML file with the necessary definitions. Here's an example of a policy sets up a basic structure where a host (myapp-host) can read and execute the database_password secret, and a group of administrators (admins) can manage the permissions of the layer that contains the host.
 
 ```yaml
 # policy.yml
@@ -34,53 +34,44 @@ To write a Conjur policy, create a YAML file with the necessary definitions. Her
     - !layer
 
     - !host
-      id: myapp01
+      id: myapp-host
 
     - !variable
-      id: database/username
-
-    - !variable
-      id: database/password
+      id: database_password
 
     - !permit
       role: !layer
       privilege: [read, execute]
-      resource: !variable database/username
+      resource: !variable database_password
 
-    - !permit
-      role: !layer
-      privilege: [read, execute]
-      resource: !variable database/password
+    - !group
+      id: admins
 
     - !grant
-      role: !layer
-      member: !host myapp01
+      role: !group admins
+      member: !layer
+
 ```
 #### Explanation of the policy:
 
-1. `Policy Block (!policy)`:
-  **id: myapp**: This creates a new policy with the identifier myapp. Policies are used to organize and manage related security objects like hosts, users, groups, variables, etc.
-2. `Layer Block (!layer)`:
-  This creates a new layer, which is a collection of related hosts (machines or processes). Layers are used to group hosts that have similar functions or security requirements. No id is specified, so it inherits the id from the parent policy, becoming myapp.
-3. `Host Block (!host)`:
-  id: myapp01: This defines a new host entity with the identifier myapp01. Hosts typically represent machines or services that can authenticate with Conjur and fetch secrets.
-4. `Variable Blocks (!variable)`:
-  id: database/username: This creates a new variable to store the database username. Variables are used to securely store and manage secrets like passwords, API keys, etc.
-id: database/password: Similarly, this creates a new variable to store the database password.
-5. `Permit Blocks (!permit)`:
-These blocks define permissions for the previously created layer to access the variables:
-The first !permit gives the myapp layer the privileges read and execute on the database/username variable.
-The second !permit gives the myapp layer the same privileges (read and execute) on the database/password variable.
-The read privilege typically allows the role to fetch the value of the variable, while execute might be used for executing actions related to the variable, depending on the system's specific implementation.
-6. `Grant Block (!grant)`:
-role: !layer: This specifies the myapp layer as the role that will receive a new member.
-member: !host myapp01: This adds the myapp01 host as a member of the myapp layer.
-By granting membership, the myapp01 host inherits the permissions assigned to the myapp layer, which means it can read and execute (or fetch) the database/username and database/password variables.
+`!policy`: This is the root of the policy document. The id field specifies the unique identifier for this policy, which in this case is myapp.
+
+`!layer`: Layers are used to group related hosts and to manage their permissions collectively. In this example, a layer is created without an explicit id, so it will inherit the id from the parent policy, resulting in myapp.
+
+`!host`: This defines a host entity, which can represent a machine or a service that will interact with Conjur. The host is given an id of myapp-host.
+
+`!variable`: Variables are used to securely store secrets. Here, a variable with the id of database_password is created to hold the password for a database.
+
+`!permit`: This statement grants permissions to a role over a resource. In this example, the layer (which implicitly has the id myapp) is granted read and execute privileges on the database_password variable.
+
+`!group`: Groups are used to manage user or host permissions collectively. A group with the id of admins is created here.
+
+`!grant`: This statement adds members to a role. The admins group is granted membership over the myapp layer, allowing administrators to manage access for the hosts in this layer.
 
 
 ## Policy Sample
 
-This Conjur policy [tienngu2_aws_prod_dev_s3_ec2](tienngu2_aws-prod-dev-s3-ec2.md) demonstrates how to define 2 layers, 2 hosts, 2 grants, 2 policies, and a permit within a Conjur policy file. Each component is explained with a reference to the official CyberArk Conjur Secrets Manager Enterprise documentation.
+This Conjur policy [tienngu2_aws-prod-dev-s3-ec2](tienngu2_aws-prod-dev-s3-ec2.md) demonstrates how to define 2 layers, 2 hosts, 2 grants, 2 policies, and a permit within a Conjur policy file. Each component is explained with a reference to the official CyberArk Conjur Secrets Manager Enterprise documentation.
 
 ## More Policy Samples
 [tienngu2_aws-ec2-rds](tienngu2_aws-ec2-rds.yaml): This policy is designed to manage access to secrets related to AWS EC2 and RDS instances within Conjur, a security service that manages secrets and other sensitive data. The policy is structured to define roles, permissions, and secrets for EC2 and RDS resources.
