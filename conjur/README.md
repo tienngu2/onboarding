@@ -80,9 +80,9 @@ By granting membership, the myapp01 host inherits the permissions assigned to th
 
 ## Policy Sample
 
-This Conjur policy [tienngu2_aws_prod_dev_s3_ec2](tienngu2_aws_prod_dev_s3_ec2.md) demonstrates how to define 2 layers, 2 hosts, 2 grants, 2 policies, and a permit within a Conjur policy file. Each component is explained with a reference to the official CyberArk Conjur Secrets Manager Enterprise documentation.
+This Conjur policy [tienngu2_aws_prod_dev_s3_ec2](tienngu2_aws-prod-dev-s3-ec2.md) demonstrates how to define 2 layers, 2 hosts, 2 grants, 2 policies, and a permit within a Conjur policy file. Each component is explained with a reference to the official CyberArk Conjur Secrets Manager Enterprise documentation.
 
 ## More Policy Samples
 [tienngu2_aws-ec2-rds](tienngu2_aws-ec2-rds.yaml): This policy is designed to manage access to secrets related to AWS EC2 and RDS instances within Conjur, a security service that manages secrets and other sensitive data. The policy is structured to define roles, permissions, and secrets for EC2 and RDS resources.
 
-[tienngu2_aws_prod_dev_s3_ec2_group_variables](tienngu2_aws_prod_dev_s3_ec2_group_variables.yaml): This policy is using a group that includes all the variables and then grant permissions to that group.
+[tienngu2_aws_prod_dev_s3_ec2_group_variables](tienngu2_aws-prod-dev-s3-ec2-group-variables.yaml): This policy is using a group that includes all the variables and then grant permissions to that group.
