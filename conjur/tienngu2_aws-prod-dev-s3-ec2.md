@@ -7,6 +7,7 @@ The policy is designed to manage access to AWS resources using Conjur. It includ
 - [Explanation of Statements](#explanation-of-statements)
 - [Direct Path and Reference](#direct-path-and-reference)
 - [CRUD CLI Commands for Managing Secrets](#crud-cli-commands-for-managing-secrets)
+- [CRUD API for Managing Secrets Using Python Conjur Client](#crud-api-for-managing-secrets-using-python-conjur-client)
 
 Site note: you can access the backup [here](tienngu2_aws_prod_dev_s3_ec2.yaml)
 ## Policy YAML
@@ -146,3 +147,66 @@ conjur variable set -i tienngu2_aws-s3-ec2/ec2_instances/instance_secret_key -v 
 ```
 conjur variable set -i <policy/path/variable-id> -v ""
 ```
+
+## CRUD API for Managing Secrets Using Python Conjur Client
+
+This section outlines the usage of two Python scripts designed to interact with a Conjur server running as a Docker container. The Conjur server is an open-source version of CyberArk Conjur, which is used for secrets management. The first script is responsible for loading a Conjur policy into the server, while the second script performs Create, Read, Update, and Delete (CRUD) operations on the secret keys defined within that policy.
+
+### Python Files
+
+#### 1. Policy Loader
+
+The [policy_loader.py](python-conjur-client/conjur-client-admin-load-policy.py) script is responsible for loading a predefined Conjur policy into the Conjur server. This policy defines the roles, permissions, and secrets that will be managed by Conjur.
+
+`Functionality`:
+Connects to the Conjur server using the provided credentials and configuration.
+Loads the policy file into the Conjur server, establishing the policy's structure and content within the server's database.
+
+`Outcome`:
+Upon successful execution, the script will output a confirmation message indicating that the policy has been loaded successfully. An accompanying [image](images/results-running-conjur-client-admin-load-policy.py.png) in the documentation shows the result of this successful policy loading.
+
+#### 2. Secrets Manager
+
+The [conjur-client-crud.py](python-conjur-client/conjur-client-crud.py) script performs CRUD operations on the secrets defined by the loaded Conjur policy.
+
+`Functionality`:
+
+Connects to the Conjur server using the necessary credentials.
+Creates new secrets or updates existing ones as defined in the policy.
+Retrieves secrets, allowing authorized applications or users to access them.
+Optionally, deletes secrets from the Conjur server when they are no longer needed or should be revoked.
+
+`Outcome`:
+The script provides output for each operation, confirming the successful creation, retrieval, updating, or deletion of secrets. The documentation includes an [image](images/results-running-conjur-client-crud.png) that demonstrates the results of these CRUD operations on the Conjur policy.
+
+
+`Execution Environment`
+
+Both scripts are designed to run against a Conjur server deployed as a Docker container. The Conjur server must be properly configured and running before executing the scripts. The scripts assume that the Conjur server is accessible and that the necessary environment variables or configuration files are set up for authentication and interaction.
+
+##### Configuration File Example
+When a Python script connects to a Conjur server, it can use the ~/.conjurrc and ~/.netrc files for configuration and authentication purposes. Here's a brief explanation of each file's role:
+```sh
+~/.conjurrc
+```
+The ~/.conjurrc file contains the Conjur server's configuration details. This file typically includes the Conjur account name, the URL of the Conjur server, and the certificate file's path (if using HTTPS). Here's an example of what the contents might look like:
+```sh
+---
+account: myConjurAccount
+appliance_url: https://proxy
+cert_file: "/path/to/conjur.pem"
+```
+This file is used by the Conjur CLI and client libraries to determine how to connect to the Conjur server.
+
+```sh
+~/.netrc
+```
+
+The ~/.netrc file is used for storing credentials needed to authenticate with the Conjur server. It keeps the login and password (API key or personal access token) secure and makes them easily accessible to scripts and tools that need to authenticate. An example entry for Conjur might look like this:
+
+```sh
+machine https://proxy/authn
+login myuser
+password myapikey
+```
+The machine directive specifies the domain of the Conjur server, while login and password provide the necessary credentials.
