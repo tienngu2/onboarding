@@ -9,7 +9,7 @@ The policy is designed to manage access to AWS resources using Conjur. It includ
 - [CRUD CLI Commands for Managing Secrets](#crud-cli-commands-for-managing-secrets)
 - [CRUD API for Managing Secrets Using Python Conjur Client](#crud-api-for-managing-secrets-using-python-conjur-client)
 
-Site note: you can access the backup [here](tienngu2_aws_prod_dev_s3_ec2.yaml)
+Site note: you can access the backup [here](tienngu2_aws-prod-dev-s3-ec2.yaml)
 ## Policy YAML
 
 ```yaml
