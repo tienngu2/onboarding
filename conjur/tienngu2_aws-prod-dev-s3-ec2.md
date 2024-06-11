@@ -140,13 +140,12 @@ conjur variable value tienngu2_aws-s3-ec2/s3_buckets/bucket_access_key
 
 Set (add) a variable value is:
 ```bash
-conjur variable set -i tienngu2_aws-s3-ec2/ec2_instances/instance_secret_key -v 'new_secret_value'
+conjur variable values add tienngu2_aws-s3-ec2/s3_buckets/bucket_access_key 'new_bucket_access_key'
 ```
 
-[Deleting variable](): To clear the value of a variable (Conjur does not support deleting a variable via the CLI):
-```
-conjur variable set -i <policy/path/variable-id> -v ""
-```
+[Deleting variable](): Conjur does not support deleting a variable via the CLI
+
+This [screenshot](images/results-running-conjur-cli-crud.png) shows log in using the credentials in the terminal window and perform CRUD using Conjur CLI.
 
 ## CRUD API for Managing Secrets Using Python Conjur Client
 
